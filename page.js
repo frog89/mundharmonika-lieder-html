@@ -1,3 +1,16 @@
+// Diagnostik-Skript: Zeigt in der Konsole (F12) exakt an, wer die URL ändert
+const originalPushState = history.pushState;
+history.pushState = function(...args) {
+  console.trace('pushState wurde aufgerufen von:', args);
+  return originalPushState.apply(this, args);
+};
+
+const originalReplaceState = history.replaceState;
+history.replaceState = function(...args) {
+  console.trace('replaceState wurde aufgerufen von:', args);
+  return originalReplaceState.apply(this, args);
+};
+
 let allSongs = [];
 
 let pageTitles = {

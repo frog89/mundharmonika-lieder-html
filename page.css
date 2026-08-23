@@ -10,9 +10,10 @@ html, body {
 
 body {
   font-family: Arial, sans-serif;
+  font-size: 1.5rem;
+  line-height: 1.6;
   background-color: #f2f2f2;
   color: #333;
-  line-height: 1.6;
   
   /* Flexbox stellt sicher, dass der Container die volle Höhe ausnutzt */
   display: flex;
@@ -70,15 +71,9 @@ nav a {
   color: #222;
   text-align: center;
   padding: 15px;
-  font-size: 1.5rem;
 }
 
 /* Hauptbereich & Sidebar */
-#main-content {
-  font-size: 1.5rem; /* Default is usually 1rem (16px). Try 1.15rem (~18px) or 1.2rem (~19px) */
-  line-height: 1.6;   /* Adjusts line spacing to keep larger text readable */
-}
-
 .content-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -129,7 +124,7 @@ aside {
 
 .filter-container select {
   padding: 5px 10px;
-  font-size: 1rem;
+  font-size: 1.5rem;
   border-radius: 4px;
   border: 1px solid #ccc;
 }
@@ -176,7 +171,6 @@ aside {
   text-align: left;
   padding: 10px;
   font-weight: bold;
-  font-size: 0.9rem;
 }
 
 .song-table td {
@@ -227,7 +221,7 @@ aside {
 .widget-content p {
   padding: 15px;
   color: #333;
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   line-height: 1.5;
 }
 
@@ -247,7 +241,6 @@ aside {
   padding: 12px 10px;
   text-decoration: none;
   font-weight: bold;
-  font-size: 0.85rem;
   letter-spacing: 0.5px;
   transition: background-color 0.2s;
 }
@@ -288,7 +281,7 @@ aside {
   color: #333;
   text-decoration: none;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 1rem;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   transition: background-color 0.2s, transform 0.1s;

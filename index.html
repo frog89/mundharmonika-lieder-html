@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Mundharmonika Lieder – Songs & Tabs für Blues Harp & Chromatische Harmonika</title>
+  
+  <!-- Meta Description (Erscheint als Vorschau-Text bei Google) -->
+  <meta name="description" content="Lerne Mundharmonika spielen! Große Auswahl an Lieder-Tabs für Blues Harp in C-Dur. Noten, MP3-Hörbeispiele & Tipps für Einsteiger und Fortgeschrittene.">
+  
+  <!-- Relevante Suchbegriffe -->
+  <meta name="keywords" content="Mundharmonika, Harmonika, Blues Harp, Tabs, Lieder, Songs, Noten, C-Dur, Mundharmonika lernen, Diatonisch, Chromatisch">
+  
+  <!-- Canonical Tag (Verhindert Duplicate Content) -->
+  <link rel="canonical" href="https://mundharmonika-lieder.de/">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="page.css">
+  <link rel="stylesheet" href="harp-styles.css">
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="header-banner-wrapper">
+        <img src="./assets/header-banner.jpg" alt="Mundharmonika-Lieder Banner">
+      </div>
+      <nav>
+        <a onclick="loadContent('main-content.html')">Startseite</a>
+        <a onclick="loadContent('/pages/einsteiger-infos.html')">Einsteiger Infos</a>
+        <a onclick="loadContent('/pages/mundharmonika-links.html')">Mundharmonika Links</a>
+      </nav>
+    </header>
+
+    <div class="banner">
+      Mundharmonika Lieder für Anfänger und Fortgeschrittene
+    </div>
+
+    <div class="content-wrapper">
+      
+      <!-- Dynamischer Hauptinhalt -->
+      <main id="main-content">
+        <!-- Der Inhalt wird durch page.js geladen -->
+      </main>
+
+      <!-- Seitenleiste -->
+      <aside>
+        <div class="widget-header">Infos</div>
+        <div class="widget-content" id="sidebar-content">
+          <!-- Der Inhalt wird dynamic per JavaScript geladen -->
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- External JavaScript -->
+  <script src="page.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  text-align: center;
+  padding: 5px;
+}
+.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+.centered-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.pad {
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 1px;
+}
+.text {
+  background-color: lightgray;
+  color: black;
+}
+.rest {
+  background-color: rgba(170, 255, 170, 0.2);
+  font-weight: bold;
+}
+.draw {
+  background-color: rgba(255, 10, 10, 0.3);
+}
+.blow {
+  background-color: rgba(90, 90, 255, 0.3);
+}
+.r1 {
+  color: rgb(0, 47, 0);
+  border-style: solid;
+}
+.r2 {
+  color: rgb(0, 47, 0);
+  border-style: dotted;
+}
+.r3 {
+  color: rgb(0, 47, 0);
+}
+.r4 {
+  color: green;
+}
+.r5 {
+  color: greenyellow; 
+}
+.r6 {
+  color: white;
+}
+.d1 { /* whole note */
+  color: red;
+  border-style: solid;
+}
+.d2 { /* half note */
+  color: red;
+  border-style: dotted;
+}
+.d3 { /* quarter note */
+  color: red;
+}
+.d4 { /* 8th note */
+  color: rgb(255, 112, 37);
+}
+.d5 { /* 16th note */
+  color: yellow;
+}
+.d6 { /* 32th note */
+  color: white;
+}
+.b1 { /* whole note */
+  color: blue; 
+  border-style: solid;
+}
+.b2 { /* half note */
+  color: blue; 
+  border-style: dotted;
+}
+.b3 { /* quarter note */
+  color: blue; 
+}
+.b4 { /* 8th note */
+  color: green; 
+}
+.b5 { /* 16th note */
+  color: greenyellow; 
+}
+.b6 { /* 32th note */
+  color: white; 
+}

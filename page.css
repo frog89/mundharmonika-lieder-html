@@ -1,0 +1,372 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  min-height: 100vh; /* Garantiert mindestens 100% der Bildschirmhöhe */
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  color: #333;
+  line-height: 1.6;
+  
+  /* Flexbox stellt sicher, dass der Container die volle Höhe ausnutzt */
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 25px; /* Adds space below all h2 headings */
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: #fff;
+  
+  /* Lässt den weißen Container bei Bedarf bis nach unten wachsen */
+  flex: 1; 
+  width: 100%;
+}
+
+header {
+  width: 100%;
+}
+
+.header-banner-wrapper {
+  /* 30px Abstand nach oben, unten, links und rechts für das Bild */
+  padding: 30px; 
+}
+
+.header-banner-wrapper img {
+  width: 100%;
+  height: auto; /* Behält die Aspect Ratio exakt bei */
+  display: block;
+}
+
+nav {
+  background-color: #dcdcdc;
+  padding: 10px 20px;
+  text-align: right;
+  width: 100%;
+}
+
+nav a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #555;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Roter Banner */
+.banner {
+  background-color: #efa4a5;
+  color: #222;
+  text-align: center;
+  padding: 15px;
+  font-size: 1.5rem;
+}
+
+/* Hauptbereich & Sidebar */
+#main-content {
+  font-size: 1.5rem; /* Default is usually 1rem (16px). Try 1.15rem (~18px) or 1.2rem (~19px) */
+  line-height: 1.6;   /* Adjusts line spacing to keep larger text readable */
+}
+
+.content-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 30px 20px;
+}
+
+main {
+  flex: 1 1 65%;
+  min-width: 280px;
+}
+
+main p {
+  margin-bottom: 15px;
+}
+
+/* Seitenleiste */
+aside {
+  flex: 1 1 30%;
+  min-width: 250px;
+  background-color: #e6e6e6;
+  border: 1px solid #ccc;
+  align-self: flex-start;
+}
+
+.widget-header {
+  background-color: #efa4a5;
+  color: #333;
+  padding: 8px 12px;
+  font-weight: bold;
+}
+
+.widget-content {
+  padding: 15px;
+}
+
+.widget-content img {
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+/* Filter Styling */
+.filter-container {
+  margin: 20px 0 10px 0;
+  font-weight: bold;
+}
+
+.filter-container select {
+  padding: 5px 10px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Text & Bild Nebeneinander (Flexbox) */
+.intro-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 25px 0;
+}
+
+.intro-text {
+  flex: 1 1 50%;
+}
+
+.intro-image {
+  flex: 1 1 50%;
+}
+
+.intro-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 2px;
+}
+
+.songtable-heading {
+  font-weight: bold;
+  margin-top: 25px;
+  margin-bottom: 15px;
+}
+
+/* Tabellen Styling */
+.song-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.song-table th {
+  background-color: #efa4a5;
+  color: #8b0000;
+  text-align: left;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.song-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.song-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.song-table a {
+  color: #333;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.song-table a:hover {
+  color: #000;
+}
+
+/* Seitenleiste (Sidebar) */
+aside {
+  flex: 1 1 30%;
+  min-width: 250px;
+  background-color: #e6e6e6;
+  border: 1px solid #ccc;
+  align-self: flex-start;
+}
+
+.widget-header {
+  background-color: #efa4a5;
+  color: #333;
+  padding: 8px 12px;
+  font-weight: bold;
+}
+
+.widget-content {
+  padding: 0; /* Padding für bündiges Bild entfernt */
+}
+
+.widget-content img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.widget-content p {
+  padding: 15px;
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Sidebar Buttons */
+.sidebar-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 10px 10px 10px;
+}
+
+.sidebar-btn {
+  display: block;
+  background-color: #efa4a5;
+  color: #222;
+  text-align: center;
+  padding: 12px 10px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s;
+}
+
+.sidebar-btn:hover {
+  background-color: #e58d8e;
+}
+
+/* ==========================================
+   Song Controls (Audio, Drucken, PDF)
+   ========================================== */
+.song-controls-container {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Zentriert die Kontrollelemente horizontal */
+  gap: 15px;               /* Abstand zwischen Audio-Player, Print und PDF Button */
+  margin: 30px auto;       /* 30px Abstand nach oben und unten */
+  width: 100%;
+}
+
+/* Audio Player */
+.song-audio {
+  max-width: 450px;       /* Verhindert das Erstrecken über die komplette Seite */
+  width: 100%;
+  height: 40px;
+}
+
+/* Generelle Buttons */
+.control-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.control-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.control-btn:active {
+  transform: translateY(1px);
+}
+
+.print-btn {
+  font-size: 1.2rem;
+}
+
+.pdf-btn {
+  background-color: #efa4a5;
+  border-color: #d88e8f;
+  color: #4a0000;
+}
+
+.pdf-btn:hover {
+  background-color: #e58d8e;
+}
+
+/* ==========================================
+   Print Stylesheet (Druckansicht)
+   ========================================== */
+@media print {
+  /* Blendet Header, Navigation, Rotes Banner, Sidebar und Kontrollelemente beim Drucken aus */
+  header, 
+  nav, 
+  .banner, 
+  aside, 
+  .song-controls-container,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Der Hauptinhalt nimmt beim Drucken die volle Breite ein */
+  .container {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .content-wrapper {
+    padding: 0 !important;
+  }
+
+  main {
+    width: 100% !important;
+    flex: none !important;
+  }
+}
+
+/* Responsive Regel: Bei Bildschirmen schmaler als 768px */
+@media (max-width: 1000px) {
+  .content-wrapper {
+    flex-direction: column; /* Stapelt die Elemente vertikal */
+  }
+
+  main {
+    width: 100%;
+  }
+
+  aside {
+    width: 100%; /* Sidebar nimmt unten die volle Breite ein */
+    margin-top: 20px;
+  }
+}
+
+/* Auf schmalen Bildschirmen Text und Bild untereinander anzeigen */
+@media (max-width: 700px) {
+  .intro-section {
+    flex-direction: column;
+  }
+}

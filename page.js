@@ -203,8 +203,21 @@ function loadSidebar() {
 
 // Beim Start aufrufen
 window.addEventListener('DOMContentLoaded', () => {
-  let path = window.location.pathname.substring(1); // Entfernt das führende "/"
-  
+  const redirectUrl = sessionStorage.getItem('redirectUrl');
+  let path = '';
+
+  if (redirectUrl) {
+    sessionStorage.removeItem('redirectUrl');
+    // Entfernt führende Slashes
+    path = redirectUrl.replace(/^\/+|\/+$/g, '');
+    
+    // Setzt die schöne URL in der Browserzeile wieder ein
+    history.replaceState({ pageUrl: path }, '', '/' + path);
+  } else {
+    // Normaler Aufruf über pathname
+    path = window.location.pathname.substring(1);
+  }
+
   if (!path || path === '' || path === 'index.html') {
     path = 'main-content.html';
   }

@@ -1,0 +1,9 @@
+# Echte Snippets und Ressourcen direkt durchlassen (kein Rewrite)
+/snippets/*  /snippets/:splat  200
+/*.js        /:splat.js        200
+/*.css       /:splat.css       200
+/*.json      /:splat.json      200
+
+# Nur Unterseiten & Songs sauber auf index.html mappen (Status 200)
+/pages/*     /index.html         200
+/songs/*     /index.html         200

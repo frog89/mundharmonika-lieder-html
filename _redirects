@@ -5,5 +5,5 @@
 /*.json      /:splat.json      200
 
 # Nur Unterseiten & Songs sauber auf index.html mappen (Status 200)
-/pages/*     /index.html         200
-/songs/*     /index.html         200
+/pages/:splat  /index.html     200
+/songs/:splat  /index.html     200

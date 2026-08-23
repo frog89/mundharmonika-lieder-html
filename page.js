@@ -16,15 +16,21 @@ function initSongTable() {
     .then(songs => {
       allSongs = songs;
 
-      // 1. Befüllen des pageTitles-Objekts für jeden Song
+      // Befüllen des pageTitles-Objekts für jeden Song
       songs.forEach(song => {
         if (song.url && song.titel) {
-          pageTitles[song.url] = `${song.titel} – Mundharmonika Tabs & Noten`;
+          // Entfernt führende Slashes für sauberen Key-Match
+          const cleanUrl = song.url.replace(/^\/+|\/+$/g, '');
+          pageTitles[cleanUrl] = `${song.titel} – Mundharmonika Tabs & Noten`;
         }
       });
 
       populateCategories();
       renderTable(songs);
+
+      // Aktualisiert den Titel nochmals, falls die Songseite vor der JSON geladen wurde
+      const currentPath = window.location.pathname.replace(/^\/+|\/+$/g, '');
+      if (currentPath) updateSEO(currentPath);
     })
     .catch(error => {
       console.error('Fehler beim Initialisieren der Songtabelle:', error);
@@ -37,6 +43,7 @@ function populateCategories() {
   if (!select) return;
 
   const categories = [...new Set(allSongs.map(song => song.kategorie))];
+  select.innerHTML = '<option value="Alle">Alle Kategorien</option>';
   categories.forEach(cat => {
     const option = document.createElement('option');
     option.value = cat;
@@ -55,7 +62,7 @@ function renderTable(songs) {
   songs.forEach(song => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><a onclick="loadContent('${song.url}')">${song.titel}</a></td>
+      <td><a onclick="loadContent('${song.url}')" style="cursor:pointer; text-decoration:underline;">${song.titel}</a></td>
       <td>${song.kategorie}</td>
       <td>${song.art}</td>
     `;
@@ -74,65 +81,15 @@ function filterSongs() {
   }
 }
 
-/*
-function loadContentOld(pageUrl, pushToHistory = true) {
-  // Stellt sicher, dass der Pfad immer absolut ist (z. B. "/pages/einsteiger-infos.html")
-  let cleanPath = pageUrl.replace(/^\/+|\/+$/g, '');
-  if (cleanPath !== 'main-content.html' && cleanPath !== '') {
-    fetchUrl = '/snippets/' + cleanPath;
-  }
-  fetch('/' + cleanPath)
-    .then(response => {
-      if (!response.ok) throw new Error('HTTP-Fehler: ' + response.status);
-      return response.text();
-    })
-    .then(html => {
-      const container = document.getElementById('main-content');
-      container.innerHTML = html;
-
-      // Inline-Scripte nativ durch Re-Insertion ausführen
-      const scripts = Array.from(container.querySelectorAll('script'));
-      scripts.forEach(oldScript => {
-        const newScript = document.createElement('script');
-        
-        if (oldScript.src) {
-          newScript.src = oldScript.src;
-        } else {
-          newScript.textContent = oldScript.textContent;
-        }
-
-        // Altes Script-Tag durch ausführbares neues ersetzen
-        oldScript.parentNode.replaceChild(newScript, oldScript);
-      });
-
-      updateSEO(cleanPath);
-
-      if (pushToHistory) {
-        history.pushState({ pageUrl: cleanPath }, '', '/' + cleanPath);
-      }
-
-      // Nach dem Ersetzen die Songtabelle initialisieren, falls Startseite
-      if (cleanPath === 'main-content.html' || cleanPath === '') {
-        initSongTable();
-      }
-    })
-    .catch(error => {
-      console.error('Fehler beim Laden von ' + pageUrl + ':', error);
-      document.getElementById('main-content').innerHTML = '<p>Inhalt konnte nicht geladen werden.</p>';
-    });
-}
-*/
-
 function loadContent(pageUrl, pushToHistory = true) {
   // 1. Pfad säubern (Slashes am Anfang und Ende entfernen)
   let cleanPath = pageUrl.replace(/^\/+|\/+$/g, '');
 
-  // Falls leer oder index.html, nutze main-content.html als Referenz
   if (!cleanPath || cleanPath === 'index.html') {
     cleanPath = 'main-content.html';
   }
 
-  // 2. ALLE Snippets liegen nun im Unterordner /snippets/
+  // 2. Fetch-Pfad aus dem snippets-Ordner
   const fetchUrl = '/snippets/' + cleanPath;
 
   fetch(fetchUrl)
@@ -159,7 +116,7 @@ function loadContent(pageUrl, pushToHistory = true) {
       // SEO-Titel aktualisieren
       updateSEO(cleanPath);
 
-      // 3. Schöne URL für den Browser/Nutzer setzen (OHNE "snippets/")
+      // 3. Browser-History aktualisieren
       if (pushToHistory) {
         history.pushState({ pageUrl: cleanPath }, '', '/' + cleanPath);
       }
@@ -177,11 +134,10 @@ function loadContent(pageUrl, pushToHistory = true) {
 
 // Aktualisiert den Browser-Titel basierend auf der geladenen URL
 function updateSEO(pageUrl) {
-  console.log(pageUrl);
-  if (pageTitles[pageUrl]) {
-    document.title = pageTitles[pageUrl];
+  const cleanUrl = pageUrl.replace(/^\/+|\/+$/g, '');
+  if (pageTitles[cleanUrl]) {
+    document.title = pageTitles[cleanUrl];
   } else {
-    // Fallback, falls die URL nicht im Objekt enthalten ist
     document.title = "Mundharmonika Lieder & Tabs";
   }
 }
@@ -203,12 +159,15 @@ function loadSidebar() {
 
 // Beim Start aufrufen
 window.addEventListener('DOMContentLoaded', () => {
-  // Liest den Pfad direkt aus der Browserzeile ab
-  let path = window.location.pathname.substring(1);
+  // Liest den Pfad ab und säubert führende/nachfolgende Slashes
+  let path = window.location.pathname.replace(/^\/+|\/+$/g, '');
 
-  if (!path || path === '' || path === 'index.html') {
+  if (!path || path === 'index.html') {
     path = 'main-content.html';
   }
+
+  // Lade immer auch all-songs.json für SEO-Titel
+  initSongTable();
 
   loadContent(path, false);
   loadSidebar();
@@ -218,7 +177,6 @@ window.addEventListener('popstate', (event) => {
   if (event.state && event.state.pageUrl) {
     loadContent(event.state.pageUrl, false);
   } else {
-    // Fallback auf Startseite
     loadContent('main-content.html', false);
   }
 });
@@ -244,25 +202,22 @@ function row(columns) {
         let tabPart = tabParts[k];
   
         let kind = tabPart.slice(0, 1);
-        //alert(tabParts + " -> " + tabPart + " -> " + kind);
-        let len = 3; // quarter note
+        let len = 3;
         let startIdxTabText = 1;
         if (kind >= '0' && kind <= '9') {
-          console.log(kind, ' is number');
           len = kind;
           startIdxTabText = 2;
           kind = tabPart.slice(1, 2);
         }
         let tabText = tabPart.slice(startIdxTabText);
-        //console.log('kind:', kind, ',len:', len, ',tabText:', tabText);
-         
-        if (kind == '-') { // draw
+          
+        if (kind == '-') {
           cellHtml += '<font class="pad draw d' + len + '">' + tabText + '</font>';
-        } else if (kind == '+') { // blow
+        } else if (kind == '+') {
           cellHtml += '<font class="pad blow b' + len + '">' + tabText + '</font>';
-        } else if (kind == 'r') { // rest
+        } else if (kind == 'r') {
           cellHtml += '<font class="pad rest r' + len + '">-</font>';
-        } else if (kind == 't') { // text
+        } else if (kind == 't') {
           cellHtml += '<font class="pad text">' + tabText + '</font>';
         }
       }

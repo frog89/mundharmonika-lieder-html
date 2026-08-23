@@ -74,10 +74,13 @@ function filterSongs() {
   }
 }
 
-function loadContent(pageUrl, pushToHistory = true) {
+/*
+function loadContentOld(pageUrl, pushToHistory = true) {
   // Stellt sicher, dass der Pfad immer absolut ist (z. B. "/pages/einsteiger-infos.html")
   let cleanPath = pageUrl.replace(/^\/+|\/+$/g, '');
-
+  if (cleanPath !== 'main-content.html' && cleanPath !== '') {
+    fetchUrl = '/snippets/' + cleanPath;
+  }
   fetch('/' + cleanPath)
     .then(response => {
       if (!response.ok) throw new Error('HTTP-Fehler: ' + response.status);
@@ -109,12 +112,65 @@ function loadContent(pageUrl, pushToHistory = true) {
       }
 
       // Nach dem Ersetzen die Songtabelle initialisieren, falls Startseite
-      if ((cleanPath === 'main-content.html' || cleanPath === '') && typeof initSongTable === 'function') {
+      if (cleanPath === 'main-content.html' || cleanPath === '') {
         initSongTable();
       }
     })
     .catch(error => {
       console.error('Fehler beim Laden von ' + pageUrl + ':', error);
+      document.getElementById('main-content').innerHTML = '<p>Inhalt konnte nicht geladen werden.</p>';
+    });
+}
+*/
+
+function loadContent(pageUrl, pushToHistory = true) {
+  // 1. Pfad säubern (Slashes am Anfang und Ende entfernen)
+  let cleanPath = pageUrl.replace(/^\/+|\/+$/g, '');
+
+  // Falls leer oder index.html, nutze main-content.html als Referenz
+  if (!cleanPath || cleanPath === 'index.html') {
+    cleanPath = 'main-content.html';
+  }
+
+  // 2. ALLE Snippets liegen nun im Unterordner /snippets/
+  const fetchUrl = '/snippets/' + cleanPath;
+
+  fetch(fetchUrl)
+    .then(response => {
+      if (!response.ok) throw new Error('HTTP-Fehler: ' + response.status);
+      return response.text();
+    })
+    .then(html => {
+      const container = document.getElementById('main-content');
+      container.innerHTML = html;
+
+      // Inline-Scripte ausführen
+      const scripts = Array.from(container.querySelectorAll('script'));
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        if (oldScript.src) {
+          newScript.src = oldScript.src;
+        } else {
+          newScript.textContent = oldScript.textContent;
+        }
+        oldScript.parentNode.replaceChild(newScript, oldScript);
+      });
+
+      // SEO-Titel aktualisieren
+      updateSEO(cleanPath);
+
+      // 3. Schöne URL für den Browser/Nutzer setzen (OHNE "snippets/")
+      if (pushToHistory) {
+        history.pushState({ pageUrl: cleanPath }, '', '/' + cleanPath);
+      }
+
+      // Falls Startseite geladen wurde, Songtabelle initialisieren
+      if (cleanPath === 'main-content.html') {
+        initSongTable();
+      }
+    })
+    .catch(error => {
+      console.error('Fehler beim Laden von ' + fetchUrl + ':', error);
       document.getElementById('main-content').innerHTML = '<p>Inhalt konnte nicht geladen werden.</p>';
     });
 }
@@ -131,7 +187,7 @@ function updateSEO(pageUrl) {
 }
 
 function loadSidebar() {
-  fetch('./pages/sidebar-content.html')
+  fetch('/snippets/pages/sidebar-content.html')
     .then(response => {
       if (!response.ok) throw new Error('Fehler beim Laden der Sidebar');
       return response.text();

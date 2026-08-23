@@ -1,240 +1,612 @@
-// Diagnostik-Skript: Zeigt in der Konsole (F12) exakt an, wer die URL ändert
-const originalPushState = history.pushState;
-history.pushState = function(...args) {
-  console.trace('pushState wurde aufgerufen von:', args);
-  return originalPushState.apply(this, args);
-};
-
-const originalReplaceState = history.replaceState;
-history.replaceState = function(...args) {
-  console.trace('replaceState wurde aufgerufen von:', args);
-  return originalReplaceState.apply(this, args);
-};
-
 let allSongs = [];
 
-let pageTitles = {
-  'main-content.html': "Mundharmonika Lieder & Tabs – Songs für Blues Harp",
-  'pages/einsteiger-infos.html': "Mundharmonika für Anfänger – Kaufberatung & Tipps | Blues Harp vs. Chrom",
-  'pages/mundharmonika-links.html': "Mundharmonika Links & Tools – Bending, Tabs & Zubehör"
+const pageTitles = {
+    'main-content': 'Mundharmonika Lieder & Tabs – Songs für Blues Harp',
+    'pages/einsteiger-infos': 'Mundharmonika für Anfänger – Kaufberatung & Tipps | Blues Harp vs. Chrom',
+    'pages/mundharmonika-links': 'Mundharmonika Links & Tools – Bending, Tabs & Zubehör'
 };
 
-// Lädt all-songs.json und befüllt die Tabelle sowie das pageTitles-Objekt
+
+/* =========================================================
+   HILFSFUNKTIONEN
+   ========================================================= */
+
+// Entfernt führende und abschließende Slashes
+function cleanPath(path) {
+    return path.replace(/^\/+|\/+$/g, '');
+}
+
+
+// Ermittelt die interne Seiten-ID aus der Browser-URL
+function getCurrentPage() {
+    let path = cleanPath(window.location.pathname);
+
+    // Startseite
+    if (!path || path === 'index.html') {
+        return 'main-content';
+    }
+
+    // .html entfernen, falls jemand eine solche URL aufruft
+    if (path.endsWith('.html')) {
+        path = path.slice(0, -5);
+    }
+
+    return path;
+}
+
+
+/* =========================================================
+   SEO
+   ========================================================= */
+
+function updateSEO(pageUrl) {
+    const cleanUrl = cleanPath(pageUrl);
+
+    if (pageTitles[cleanUrl]) {
+        document.title = pageTitles[cleanUrl];
+    } else {
+        document.title = 'Mundharmonika Lieder & Tabs';
+    }
+}
+
+
+/* =========================================================
+   SONG-TABELLE
+   ========================================================= */
+
 function initSongTable() {
-  fetch('all-songs.json')
-    .then(response => {
-      if (!response.ok) throw new Error('all-songs.json konnte nicht geladen werden');
-      return response.json();
-    })
-    .then(songs => {
-      allSongs = songs;
 
-      // Befüllen des pageTitles-Objekts für jeden Song
-      songs.forEach(song => {
-        if (song.url && song.titel) {
-          // Entfernt führende Slashes für sauberen Key-Match
-          const cleanUrl = song.url.replace(/^\/+|\/+$/g, '');
-          pageTitles[cleanUrl] = `${song.titel} – Mundharmonika Tabs & Noten`;
-        }
-      });
+    fetch('/all-songs.json')
+        .then(response => {
 
-      populateCategories();
-      renderTable(songs);
+            if (!response.ok) {
+                throw new Error(
+                    'all-songs.json konnte nicht geladen werden: ' +
+                    response.status
+                );
+            }
 
-      // Aktualisiert den Titel nochmals, falls die Songseite vor der JSON geladen wurde
-      const currentPath = window.location.pathname.replace(/^\/+|\/+$/g, '');
-      if (currentPath) updateSEO(currentPath);
-    })
-    .catch(error => {
-      console.error('Fehler beim Initialisieren der Songtabelle:', error);
+            return response.json();
+        })
+
+        .then(songs => {
+
+            allSongs = songs;
+
+            // SEO-Titel für Songs erzeugen
+            songs.forEach(song => {
+
+                if (song.url && song.titel) {
+
+                    const cleanUrl = cleanPath(song.url)
+                        .replace(/\.html$/, '');
+
+                    pageTitles[cleanUrl] =
+                        `${song.titel} – Mundharmonika Tabs & Noten`;
+                }
+            });
+
+            populateCategories();
+            renderTable(allSongs);
+
+            // Nach dem Laden der Songs den Titel
+            // der aktuell geöffneten Seite aktualisieren
+            const currentPage = getCurrentPage();
+
+            if (currentPage) {
+                updateSEO(currentPage);
+            }
+        })
+
+        .catch(error => {
+            console.error(
+                'Fehler beim Initialisieren der Songtabelle:',
+                error
+            );
+        });
+}
+
+
+/* =========================================================
+   KATEGORIEN
+   ========================================================= */
+
+function populateCategories() {
+
+    const select = document.getElementById('category-filter');
+
+    if (!select) {
+        return;
+    }
+
+    const categories = [
+        ...new Set(
+            allSongs
+                .map(song => song.kategorie)
+                .filter(Boolean)
+        )
+    ];
+
+    select.innerHTML = '<option value="Alle">Alle Kategorien</option>';
+
+    categories.forEach(category => {
+
+        const option = document.createElement('option');
+
+        option.value = category;
+        option.textContent = category;
+
+        select.appendChild(option);
     });
 }
 
-// Füllt das Dropdown-Menü dynamisch mit Kategorien
-function populateCategories() {
-  const select = document.getElementById('category-filter');
-  if (!select) return;
 
-  const categories = [...new Set(allSongs.map(song => song.kategorie))];
-  select.innerHTML = '<option value="Alle">Alle Kategorien</option>';
-  categories.forEach(cat => {
-    const option = document.createElement('option');
-    option.value = cat;
-    option.textContent = cat;
-    select.appendChild(option);
-  });
-}
+/* =========================================================
+   SONG-TABELLE RENDERN
+   ========================================================= */
 
-// Rendert die Tabellenzeilen
 function renderTable(songs) {
-  const tbody = document.getElementById('song-table-body');
-  if (!tbody) return;
-  
-  tbody.innerHTML = '';
 
-  songs.forEach(song => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><a onclick="loadContent('${song.url}')" style="cursor:pointer; text-decoration:underline;">${song.titel}</a></td>
-      <td>${song.kategorie}</td>
-      <td>${song.art}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+    const tbody = document.getElementById('song-table-body');
+
+    if (!tbody) {
+        return;
+    }
+
+    tbody.innerHTML = '';
+
+    songs.forEach(song => {
+
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+            <td>
+                <a
+                    href="/${cleanPath(song.url)}"
+                    onclick="loadContent('${cleanPath(song.url)}'); return false;"
+                    style="cursor:pointer; text-decoration:underline;"
+                >
+                    ${song.titel}
+                </a>
+            </td>
+
+            <td>${song.kategorie || ''}</td>
+            <td>${song.art || ''}</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
 }
 
-// Filtert die Daten je nach Auswahl
+
+/* =========================================================
+   SONG-FILTER
+   ========================================================= */
+
 function filterSongs() {
-  const selectedCategory = document.getElementById('category-filter').value;
-  if (selectedCategory === 'Alle') {
-    renderTable(allSongs);
-  } else {
-    const filtered = allSongs.filter(song => song.kategorie === selectedCategory);
-    renderTable(filtered);
-  }
+
+    const select = document.getElementById('category-filter');
+
+    if (!select) {
+        return;
+    }
+
+    const selectedCategory = select.value;
+
+    if (selectedCategory === 'Alle') {
+
+        renderTable(allSongs);
+
+    } else {
+
+        const filtered = allSongs.filter(
+            song => song.kategorie === selectedCategory
+        );
+
+        renderTable(filtered);
+    }
 }
+
+
+/* =========================================================
+   SEITE / SNIPPET LADEN
+   ========================================================= */
 
 function loadContent(pageUrl, pushToHistory = true) {
-  // 1. Pfad säubern (Slashes am Anfang und Ende entfernen)
-  let cleanPath = pageUrl.replace(/^\/+|\/+$/g, '');
 
-  if (!cleanPath || cleanPath === 'index.html') {
-    cleanPath = 'main-content.html';
-  }
+    let cleanPage = cleanPath(pageUrl);
 
-  // 2. Fetch-Pfad aus dem snippets-Ordner
-  const fetchUrl = '/snippets/' + cleanPath;
+    /*
+     * Startseite
+     */
+    if (!cleanPage || cleanPage === 'index.html') {
+        cleanPage = 'main-content';
+    }
 
-  fetch(fetchUrl)
-    .then(response => {
-      if (!response.ok) throw new Error('HTTP-Fehler: ' + response.status);
-      return response.text();
-    })
-    .then(html => {
-      const container = document.getElementById('main-content');
-      container.innerHTML = html;
+    /*
+     * .html entfernen
+     *
+     * Beispiel:
+     *
+     * pages/test.html
+     *
+     * wird zu:
+     *
+     * pages/test
+     */
+    cleanPage = cleanPage.replace(/\.html$/, '');
 
-      // Inline-Scripte ausführen
-      const scripts = Array.from(container.querySelectorAll('script'));
-      scripts.forEach(oldScript => {
-        const newScript = document.createElement('script');
-        if (oldScript.src) {
-          newScript.src = oldScript.src;
-        } else {
-          newScript.textContent = oldScript.textContent;
-        }
-        oldScript.parentNode.replaceChild(newScript, oldScript);
-      });
 
-      // SEO-Titel aktualisieren
-      updateSEO(cleanPath);
+    /*
+     * Daraus wird der tatsächliche Snippet-Pfad:
+     *
+     * pages/test
+     *      ↓
+     * /snippets/pages/test.html
+     */
+    const fetchUrl = `/snippets/${cleanPage}.html`;
 
-      // 3. Browser-History aktualisieren
-      if (pushToHistory) {
-        history.pushState({ pageUrl: cleanPath }, '', '/' + cleanPath);
-      }
+    console.log('Lade Seite:', cleanPage);
+    console.log('Snippet:', fetchUrl);
 
-      // Falls Startseite geladen wurde, Songtabelle initialisieren
-      if (cleanPath === 'main-content.html') {
-        initSongTable();
-      }
-    })
-    .catch(error => {
-      console.error('Fehler beim Laden von ' + fetchUrl + ':', error);
-      document.getElementById('main-content').innerHTML = '<p>Inhalt konnte nicht geladen werden.</p>';
-    });
+
+    fetch(fetchUrl)
+
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `HTTP ${response.status}: ${fetchUrl}`
+                );
+            }
+
+            return response.text();
+        })
+
+        .then(html => {
+
+            const container =
+                document.getElementById('main-content');
+
+            if (!container) {
+                throw new Error(
+                    '#main-content wurde nicht gefunden'
+                );
+            }
+
+
+            /*
+             * HTML des Snippets einsetzen
+             */
+            container.innerHTML = html;
+
+
+            /*
+             * Scripts aus dem geladenen Snippet
+             * erneut ausführen
+             */
+            const scripts =
+                Array.from(container.querySelectorAll('script'));
+
+            scripts.forEach(oldScript => {
+
+                const newScript =
+                    document.createElement('script');
+
+
+                if (oldScript.src) {
+
+                    /*
+                     * Relative Script-URLs auflösen
+                     */
+                    newScript.src =
+                        new URL(
+                            oldScript.src,
+                            window.location.origin
+                        ).href;
+
+                } else {
+
+                    newScript.textContent =
+                        oldScript.textContent;
+                }
+
+
+                /*
+                 * Attribute übernehmen
+                 */
+                Array.from(oldScript.attributes).forEach(attr => {
+
+                    if (attr.name !== 'src') {
+                        newScript.setAttribute(
+                            attr.name,
+                            attr.value
+                        );
+                    }
+                });
+
+
+                oldScript.parentNode.replaceChild(
+                    newScript,
+                    oldScript
+                );
+            });
+
+
+            /*
+             * Browser-Titel aktualisieren
+             */
+            updateSEO(cleanPage);
+
+
+            /*
+             * Browser-History aktualisieren
+             */
+            if (pushToHistory) {
+
+                const browserUrl =
+                    cleanPage === 'main-content'
+                        ? '/'
+                        : `/${cleanPage}`;
+
+                history.pushState(
+                    {
+                        pageUrl: cleanPage
+                    },
+                    '',
+                    browserUrl
+                );
+            }
+
+
+            /*
+             * Song-Tabelle nur auf der Startseite
+             */
+            if (cleanPage === 'main-content') {
+                initSongTable();
+            }
+        })
+
+        .catch(error => {
+
+            console.error(
+                'Fehler beim Laden von ' + fetchUrl,
+                error
+            );
+
+            const container =
+                document.getElementById('main-content');
+
+            if (container) {
+
+                container.innerHTML = `
+                    <p>
+                        Inhalt konnte nicht geladen werden.
+                    </p>
+                `;
+            }
+        });
 }
 
-// Aktualisiert den Browser-Titel basierend auf der geladenen URL
-function updateSEO(pageUrl) {
-  const cleanUrl = pageUrl.replace(/^\/+|\/+$/g, '');
-  if (pageTitles[cleanUrl]) {
-    document.title = pageTitles[cleanUrl];
-  } else {
-    document.title = "Mundharmonika Lieder & Tabs";
-  }
-}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
 
 function loadSidebar() {
-  fetch('/snippets/pages/sidebar-content.html')
-    .then(response => {
-      if (!response.ok) throw new Error('Fehler beim Laden der Sidebar');
-      return response.text();
-    })
-    .then(html => {
-      const sidebarContainer = document.getElementById('sidebar-content');
-      if (sidebarContainer) {
-        sidebarContainer.innerHTML = html;
-      }
-    })
-    .catch(error => console.error('Fehler:', error));
+
+    fetch('/snippets/pages/sidebar-content.html')
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    'Fehler beim Laden der Sidebar'
+                );
+            }
+
+            return response.text();
+        })
+
+        .then(html => {
+
+            const sidebarContainer =
+                document.getElementById('sidebar-content');
+
+            if (sidebarContainer) {
+                sidebarContainer.innerHTML = html;
+            }
+        })
+
+        .catch(error => {
+
+            console.error(
+                'Fehler beim Laden der Sidebar:',
+                error
+            );
+        });
 }
 
-// Beim Start aufrufen
+
+/* =========================================================
+   START
+   ========================================================= */
+
 window.addEventListener('DOMContentLoaded', () => {
-  // Liest den Pfad ab und säubert führende/nachfolgende Slashes
-  let path = window.location.pathname.replace(/^\/+|\/+$/g, '');
 
-  if (!path || path === 'index.html') {
-    path = 'main-content.html';
-  }
+    /*
+     * Aktuelle Browser-URL ermitteln
+     *
+     * /
+     * /pages/einsteiger-infos
+     * /songs/house-of-the-rising-sun
+     */
+    const currentPage = getCurrentPage();
 
-  // Lade immer auch all-songs.json für SEO-Titel
-  initSongTable();
+    console.log('Aktuelle Seite:', currentPage);
 
-  loadContent(path, false);
-  loadSidebar();
+
+    /*
+     * Songdaten laden
+     *
+     * Wichtig:
+     * Das passiert unabhängig davon,
+     * welche Unterseite geöffnet wurde.
+     */
+    initSongTable();
+
+
+    /*
+     * Aktuelle Seite laden
+     *
+     * false = keinen neuen History-Eintrag erzeugen
+     */
+    loadContent(currentPage, false);
+
+
+    /*
+     * Sidebar laden
+     */
+    loadSidebar();
 });
 
-window.addEventListener('popstate', (event) => {
-  if (event.state && event.state.pageUrl) {
-    loadContent(event.state.pageUrl, false);
-  } else {
-    loadContent('main-content.html', false);
-  }
+
+/* =========================================================
+   BACK / FORWARD
+   ========================================================= */
+
+window.addEventListener('popstate', event => {
+
+    if (event.state && event.state.pageUrl) {
+
+        loadContent(
+            event.state.pageUrl,
+            false
+        );
+
+    } else {
+
+        /*
+         * Falls kein History-State vorhanden ist,
+         * URL erneut auslesen.
+         */
+        const currentPage = getCurrentPage();
+
+        loadContent(
+            currentPage,
+            false
+        );
+    }
 });
+
+
+/* =========================================================
+   TAB-ZEILEN
+   ========================================================= */
 
 function row(columns) {
-  const table = document.currentScript.closest('table');
-  var row = table.insertRow();
 
-  for (i=0; i<columns.length; i++) {
-    let column = columns[i];
-    var cell = row.insertCell();
-    let cellHtml = "";
+    const table =
+        document.currentScript.closest('table');
 
-    let tabs = column.split(' ');
-    for (j=0; j<tabs.length; j++) {
-      let tab = tabs[j];
-      if (j > 0) {
-        cellHtml += "&nbsp;&nbsp;&nbsp;";
-      }
+    const tableRow =
+        table.insertRow();
 
-      let tabParts = tab.split('&')
-      for (k=0; k<tabParts.length; k++) {
-        let tabPart = tabParts[k];
-  
-        let kind = tabPart.slice(0, 1);
-        let len = 3;
-        let startIdxTabText = 1;
-        if (kind >= '0' && kind <= '9') {
-          len = kind;
-          startIdxTabText = 2;
-          kind = tabPart.slice(1, 2);
+
+    for (let i = 0; i < columns.length; i++) {
+
+        const column = columns[i];
+
+        const cell =
+            tableRow.insertCell();
+
+        let cellHtml = '';
+
+        const tabs =
+            column.split(' ');
+
+
+        for (let j = 0; j < tabs.length; j++) {
+
+            const tab = tabs[j];
+
+            if (j > 0) {
+                cellHtml += '&nbsp;&nbsp;&nbsp;';
+            }
+
+
+            const tabParts =
+                tab.split('&');
+
+
+            for (let k = 0; k < tabParts.length; k++) {
+
+                let tabPart =
+                    tabParts[k];
+
+                let kind =
+                    tabPart.slice(0, 1);
+
+                let len = 3;
+
+                let startIdxTabText = 1;
+
+
+                /*
+                 * Zahl vor dem Tab:
+                 *
+                 * 2-xxx
+                 * 4+xxx
+                 */
+                if (
+                    kind >= '0' &&
+                    kind <= '9'
+                ) {
+
+                    len =
+                        parseInt(kind, 10);
+
+                    startIdxTabText = 2;
+
+                    kind =
+                        tabPart.slice(1, 2);
+                }
+
+
+                const tabText =
+                    tabPart.slice(startIdxTabText);
+
+
+                if (kind === '-') {
+
+                    cellHtml +=
+                        `<font class="pad draw d${len}">` +
+                        tabText +
+                        '</font>';
+
+                } else if (kind === '+') {
+
+                    cellHtml +=
+                        `<font class="pad blow b${len}">` +
+                        tabText +
+                        '</font>';
+
+                } else if (kind === 'r') {
+
+                    cellHtml +=
+                        `<font class="pad rest r${len}">-</font>`;
+
+                } else if (kind === 't') {
+
+                    cellHtml +=
+                        `<font class="pad text">` +
+                        tabText +
+                        '</font>';
+                }
+            }
         }
-        let tabText = tabPart.slice(startIdxTabText);
-          
-        if (kind == '-') {
-          cellHtml += '<font class="pad draw d' + len + '">' + tabText + '</font>';
-        } else if (kind == '+') {
-          cellHtml += '<font class="pad blow b' + len + '">' + tabText + '</font>';
-        } else if (kind == 'r') {
-          cellHtml += '<font class="pad rest r' + len + '">-</font>';
-        } else if (kind == 't') {
-          cellHtml += '<font class="pad text">' + tabText + '</font>';
-        }
-      }
+
+        cell.innerHTML = cellHtml;
     }
-    cell.innerHTML = cellHtml;
-  }
 }

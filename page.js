@@ -41,11 +41,27 @@ function getCurrentPage() {
 
 function updateSEO(pageUrl) {
     const cleanUrl = cleanPath(pageUrl);
+    console.log('cleanUrl: ', cleanUrl);
 
     if (pageTitles[cleanUrl]) {
         document.title = pageTitles[cleanUrl];
     } else {
         document.title = 'Mundharmonika Lieder & Tabs';
+    }
+
+    // 2. Robots Meta-Tag dynamisch steuern
+    let metaRobots = document.querySelector('meta[name="robots"]');
+    if (!metaRobots) {
+        metaRobots = document.createElement('meta');
+        metaRobots.name = 'robots';
+        document.head.appendChild(metaRobots);
+    }
+
+    // Seiten, die NICHT von Google indiziert werden sollen:
+    if (cleanUrl === 'pages/impressum' || cleanUrl === 'pages/datenschutz') {
+        metaRobots.content = 'noindex, nofollow';
+    } else {
+        metaRobots.content = 'index, follow';
     }
 }
 

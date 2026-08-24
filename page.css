@@ -363,3 +363,38 @@ aside {
     flex-direction: column;
   }
 }
+
+/* Footer-Container im OceanWP-Look */
+.site-footer {
+  background-color: #1b1b1b; /* Sehr dunkler Hintergrund */
+  color: #88a4c8;             /* Gedämpftes Blau für den Copyright-Text */
+  padding: 15px 20px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  border-top: 1px solid #2a2a2a;
+}
+
+.footer-content {
+  display: inline-block;
+}
+
+/* Links im Footer */
+.footer-link {
+  color: #ffffff !important;   /* Reinweißer Text für Impressum & Datenschutz */
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+  color: #cccccc !important;
+}
+
+/* Trennstriche */
+.separator {
+  color: #88a4c8;
+  margin: 0 4px;
+}

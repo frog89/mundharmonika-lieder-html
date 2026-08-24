@@ -1,8 +1,0 @@
-{
-  "liveServer.settings.middleware": [
-    {
-      "route": "/",
-      "handle": "spa"
-    }
-  ]
-}

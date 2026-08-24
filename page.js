@@ -41,7 +41,7 @@ function getCurrentPage() {
 
 function updateSEO(pageUrl) {
     const cleanUrl = cleanPath(pageUrl);
-    console.log('cleanUrl: ', cleanUrl);
+    console.debug('cleanUrl: ', cleanUrl);
 
     if (pageTitles[cleanUrl]) {
         document.title = pageTitles[cleanUrl];
@@ -262,8 +262,8 @@ function loadContent(pageUrl, pushToHistory = true) {
      */
     const fetchUrl = `/snippets/${cleanPage}.html`;
 
-    console.log('Lade Seite:', cleanPage);
-    console.log('Snippet:', fetchUrl);
+    console.debug('Lade Seite:', cleanPage);
+    console.debug('Snippet:', fetchUrl);
 
 
     fetch(fetchUrl)
@@ -460,7 +460,7 @@ window.addEventListener('DOMContentLoaded', () => {
      */
     const currentPage = getCurrentPage();
 
-    console.log('Aktuelle Seite:', currentPage);
+    console.debug('Aktuelle Seite:', currentPage);
 
 
     /*

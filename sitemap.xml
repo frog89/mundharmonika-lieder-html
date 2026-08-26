@@ -13,6 +13,10 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://www.mundharmonika-lieder.de/songs/12-bar-blues</loc>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://www.mundharmonika-lieder.de/songs/aint-no-sunshine</loc>
     <priority>0.6</priority>
   </url>

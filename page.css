@@ -356,17 +356,17 @@ aside {
     width: 100%; /* Sidebar nimmt unten die volle Breite ein */
     margin-top: 20px;
   }
-
-  nav a {
-    margin-left: 10px;
-    font-size: 0.8rem;
-  }
 }
 
 /* Auf schmalen Bildschirmen Text und Bild untereinander anzeigen */
 @media (max-width: 700px) {
   .intro-section {
     flex-direction: column;
+  }
+
+  nav a {
+    margin-left: 10px;
+    font-size: 0.8rem;
   }
 }
 

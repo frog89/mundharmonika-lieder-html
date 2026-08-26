@@ -41,6 +41,10 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://www.mundharmonika-lieder.de/songs/fun-blues</loc>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://www.mundharmonika-lieder.de/songs/fuer-ein-paar-dollar-mehr</loc>
     <priority>0.6</priority>
   </url>

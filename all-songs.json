@@ -1,11 +1,12 @@
 [
-{ "titel": "12 Bar Blues", "kategorie": "Oldie", "art": "Diatonisch", "url": "/songs/12-bar-blues" },
+{ "titel": "12 Bar Blues", "kategorie": "Blues", "art": "Diatonisch", "url": "/songs/12-bar-blues" },
 { "titel": "Aint No Sunshine", "kategorie": "Oldie", "art": "Diatonisch", "url": "/songs/aint-no-sunshine" },
 { "titel": "Alle Jahre wieder", "kategorie": "Weihnachten", "art": "Diatonisch", "url": "/songs/alle-jahre-wieder" },
 { "titel": "Amazing Grace", "kategorie": "Oldie", "art": "Diatonisch", "url": "/songs/amazing-grace" },
 { "titel": "Country Roads", "kategorie": "Oldie", "art": "Diatonisch", "url": "/songs/country-roads" },
 { "titel": "Dark Eyes", "kategorie": "Klassik", "art": "Diatonisch", "url": "/songs/dark-eyes" },
 { "titel": "Deck the Halls", "kategorie": "Weihnachten", "art": "Diatonisch", "url": "/songs/deck-the-halls" },
+{ "titel": "Fun Blues", "kategorie": "Blues", "art": "Diatonisch", "url": "/songs/fun-blues" },
 { "titel": "Für ein paar Dollar mehr", "kategorie": "Western", "art": "Diatonisch", "url": "/songs/fuer-ein-paar-dollar-mehr" },
 { "titel": "Für eine Handvoll Dollar", "kategorie": "Western", "art": "Diatonisch", "url": "/songs/fuer-eine-handvoll-dollar" },
 { "titel": "God Rest Ye Merry Gentleman", "kategorie": "Weihnachten", "art": "Chromatisch", "url": "/songs/god-rest-ye-merry-gentleman" },

@@ -6,11 +6,9 @@ const pageTitles = {
     'pages/mundharmonika-links': 'Mundharmonika Links & Tools – Bending, Tabs & Zubehör'
 };
 
-
 /* =========================================================
    HILFSFUNKTIONEN
    ========================================================= */
-
 // Entfernt führende und abschließende Slashes
 function cleanPath(path) {
     return path.replace(/^\/+|\/+$/g, '');
@@ -34,11 +32,9 @@ function getCurrentPage() {
     return path;
 }
 
-
 /* =========================================================
    SEO
    ========================================================= */
-
 function updateSEO(pageUrl) {
     const cleanUrl = cleanPath(pageUrl);
     console.debug('cleanUrl: ', cleanUrl);
@@ -65,16 +61,12 @@ function updateSEO(pageUrl) {
     }
 }
 
-
 /* =========================================================
    SONG-TABELLE
    ========================================================= */
-
 function initSongTable() {
-
     fetch('/all-songs.json')
         .then(response => {
-
             if (!response.ok) {
                 throw new Error(
                     'all-songs.json konnte nicht geladen werden: ' +
@@ -84,7 +76,6 @@ function initSongTable() {
 
             return response.json();
         })
-
         .then(songs => {
 
             allSongs = songs;
@@ -113,7 +104,6 @@ function initSongTable() {
                 updateSEO(currentPage);
             }
         })
-
         .catch(error => {
             console.error(
                 'Fehler beim Initialisieren der Songtabelle:',
@@ -122,13 +112,10 @@ function initSongTable() {
         });
 }
 
-
 /* =========================================================
    KATEGORIEN
    ========================================================= */
-
 function populateCategories() {
-
     const select = document.getElementById('category-filter');
 
     if (!select) {
@@ -156,13 +143,10 @@ function populateCategories() {
     });
 }
 
-
 /* =========================================================
    SONG-TABELLE RENDERN
    ========================================================= */
-
 function renderTable(songs) {
-
     const tbody = document.getElementById('song-table-body');
 
     if (!tbody) {
@@ -172,7 +156,6 @@ function renderTable(songs) {
     tbody.innerHTML = '';
 
     songs.forEach(song => {
-
         const tr = document.createElement('tr');
 
         tr.innerHTML = `
@@ -194,13 +177,10 @@ function renderTable(songs) {
     });
 }
 
-
 /* =========================================================
    SONG-FILTER
    ========================================================= */
-
 function filterSongs() {
-
     const select = document.getElementById('category-filter');
 
     if (!select) {
@@ -210,11 +190,8 @@ function filterSongs() {
     const selectedCategory = select.value;
 
     if (selectedCategory === 'Alle') {
-
         renderTable(allSongs);
-
     } else {
-
         const filtered = allSongs.filter(
             song => song.kategorie === selectedCategory
         );
@@ -223,13 +200,10 @@ function filterSongs() {
     }
 }
 
-
 /* =========================================================
    SEITE / SNIPPET LADEN
    ========================================================= */
-
 function loadContent(pageUrl, pushToHistory = true) {
-
     let cleanPage = cleanPath(pageUrl);
 
     /*
@@ -265,13 +239,9 @@ function loadContent(pageUrl, pushToHistory = true) {
     console.debug('Lade Seite:', cleanPage);
     console.debug('Snippet:', fetchUrl);
 
-
     fetch(fetchUrl)
-
         .then(response => {
-
             if (!response.ok) {
-
                 throw new Error(
                     `HTTP ${response.status}: ${fetchUrl}`
                 );
@@ -279,9 +249,7 @@ function loadContent(pageUrl, pushToHistory = true) {
 
             return response.text();
         })
-
         .then(html => {
-
             const container =
                 document.getElementById('main-content');
 
@@ -291,12 +259,10 @@ function loadContent(pageUrl, pushToHistory = true) {
                 );
             }
 
-
             /*
              * HTML des Snippets einsetzen
              */
             container.innerHTML = html;
-
 
             /*
              * Scripts aus dem geladenen Snippet
@@ -306,13 +272,10 @@ function loadContent(pageUrl, pushToHistory = true) {
                 Array.from(container.querySelectorAll('script'));
 
             scripts.forEach(oldScript => {
-
                 const newScript =
                     document.createElement('script');
 
-
                 if (oldScript.src) {
-
                     /*
                      * Relative Script-URLs auflösen
                      */
@@ -323,11 +286,9 @@ function loadContent(pageUrl, pushToHistory = true) {
                         ).href;
 
                 } else {
-
                     newScript.textContent =
                         oldScript.textContent;
                 }
-
 
                 /*
                  * Attribute übernehmen
@@ -342,19 +303,16 @@ function loadContent(pageUrl, pushToHistory = true) {
                     }
                 });
 
-
                 oldScript.parentNode.replaceChild(
                     newScript,
                     oldScript
                 );
             });
 
-
             /*
              * Browser-Titel aktualisieren
              */
             updateSEO(cleanPage);
-
 
             /*
              * Browser-History aktualisieren
@@ -375,17 +333,21 @@ function loadContent(pageUrl, pushToHistory = true) {
                 );
             }
 
-
             /*
              * Song-Tabelle nur auf der Startseite
              */
             if (cleanPage === 'main-content') {
                 initSongTable();
             }
+
+            // === SEITE NACH OBEN SCROLLEN ===
+            window.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: 'smooth' // Nutze 'auto' für einen sofortigen Sprung ohne Animation
+            });
         })
-
         .catch(error => {
-
             console.error(
                 'Fehler beim Laden von ' + fetchUrl,
                 error
@@ -395,7 +357,6 @@ function loadContent(pageUrl, pushToHistory = true) {
                 document.getElementById('main-content');
 
             if (container) {
-
                 container.innerHTML = `
                     <p>
                         Inhalt konnte nicht geladen werden.
@@ -405,17 +366,12 @@ function loadContent(pageUrl, pushToHistory = true) {
         });
 }
 
-
 /* =========================================================
    SIDEBAR
    ========================================================= */
-
 function loadSidebar() {
-
     fetch('/snippets/pages/sidebar-content.html')
-
         .then(response => {
-
             if (!response.ok) {
                 throw new Error(
                     'Fehler beim Laden der Sidebar'
@@ -424,9 +380,7 @@ function loadSidebar() {
 
             return response.text();
         })
-
         .then(html => {
-
             const sidebarContainer =
                 document.getElementById('sidebar-content');
 
@@ -434,9 +388,7 @@ function loadSidebar() {
                 sidebarContainer.innerHTML = html;
             }
         })
-
         .catch(error => {
-
             console.error(
                 'Fehler beim Laden der Sidebar:',
                 error
@@ -444,13 +396,10 @@ function loadSidebar() {
         });
 }
 
-
 /* =========================================================
    START
    ========================================================= */
-
 window.addEventListener('DOMContentLoaded', () => {
-
     /*
      * Aktuelle Browser-URL ermitteln
      *
@@ -462,7 +411,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     console.debug('Aktuelle Seite:', currentPage);
 
-
     /*
      * Songdaten laden
      *
@@ -472,14 +420,12 @@ window.addEventListener('DOMContentLoaded', () => {
      */
     initSongTable();
 
-
     /*
      * Aktuelle Seite laden
      *
      * false = keinen neuen History-Eintrag erzeugen
      */
     loadContent(currentPage, false);
-
 
     /*
      * Sidebar laden
@@ -493,16 +439,12 @@ window.addEventListener('DOMContentLoaded', () => {
    ========================================================= */
 
 window.addEventListener('popstate', event => {
-
     if (event.state && event.state.pageUrl) {
-
         loadContent(
             event.state.pageUrl,
             false
         );
-
     } else {
-
         /*
          * Falls kein History-State vorhanden ist,
          * URL erneut auslesen.
@@ -516,22 +458,18 @@ window.addEventListener('popstate', event => {
     }
 });
 
-
 /* =========================================================
    TAB-ZEILEN
    ========================================================= */
 
 function row(columns) {
-
     const table =
         document.currentScript.closest('table');
 
     const tableRow =
         table.insertRow();
 
-
     for (let i = 0; i < columns.length; i++) {
-
         const column = columns[i];
 
         const cell =
@@ -542,22 +480,17 @@ function row(columns) {
         const tabs =
             column.split(' ');
 
-
         for (let j = 0; j < tabs.length; j++) {
-
             const tab = tabs[j];
 
             if (j > 0) {
                 cellHtml += '&nbsp;&nbsp;&nbsp;';
             }
 
-
             const tabParts =
                 tab.split('&');
 
-
             for (let k = 0; k < tabParts.length; k++) {
-
                 let tabPart =
                     tabParts[k];
 
@@ -567,7 +500,6 @@ function row(columns) {
                 let len = 3;
 
                 let startIdxTabText = 1;
-
 
                 /*
                  * Zahl vor dem Tab:
@@ -579,7 +511,6 @@ function row(columns) {
                     kind >= '0' &&
                     kind <= '9'
                 ) {
-
                     len =
                         parseInt(kind, 10);
 
@@ -589,32 +520,23 @@ function row(columns) {
                         tabPart.slice(1, 2);
                 }
 
-
                 const tabText =
                     tabPart.slice(startIdxTabText);
 
-
                 if (kind === '-') {
-
                     cellHtml +=
                         `<font class="pad draw d${len}">` +
                         tabText +
                         '</font>';
-
                 } else if (kind === '+') {
-
                     cellHtml +=
                         `<font class="pad blow b${len}">` +
                         tabText +
                         '</font>';
-
                 } else if (kind === 'r') {
-
                     cellHtml +=
                         `<font class="pad rest r${len}">-</font>`;
-
                 } else if (kind === 't') {
-
                     cellHtml +=
                         `<font class="pad text">` +
                         tabText +

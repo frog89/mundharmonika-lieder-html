@@ -356,6 +356,11 @@ aside {
     width: 100%; /* Sidebar nimmt unten die volle Breite ein */
     margin-top: 20px;
   }
+
+  nav a {
+    margin-left: 10px;
+    font-size: 0.9rem;
+  }
 }
 
 /* Auf schmalen Bildschirmen Text und Bild untereinander anzeigen */
